@@ -1,5 +1,8 @@
 {-#LANGUAGE FlexibleContexts #-}
 
+-- | The module `Parser.CharSet` contains parsers for several character sets.
+-- Copyright : (c) 2012 Marcelo Sousa <dipython@gmail.com>
+
 module Parser.CharSet where
 
 import Text.ParserCombinators.UU.BasicInstances

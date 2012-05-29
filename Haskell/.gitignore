@@ -1,0 +1,6 @@
+# Ignore mac files
+.DS_Store
+
+# Ignore binaries
+dist
+dist/**/*
