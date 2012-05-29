@@ -1,57 +1,52 @@
 {-#LANGUAGE FlexibleContexts #-}
 
--- | The module `Parser.CharSet` contains parsers for several character sets.
--- Copyright : (c) 2012 Marcelo Sousa <dipython@gmail.com>
-
+{-| The module "Parser.CharSet" contains parsers for several character sets.
+    Copyright : (c) 2012 Marcelo Sousa <dipython@gmail.com>
+-}
 module Parser.CharSet where
 
 import Text.ParserCombinators.UU.BasicInstances
 import Text.ParserCombinators.UU.Utils
 import Text.ParserCombinators.UU hiding (parse)
 
--- Character Sets
-
--- 'digits' is already defined in the UU lib
--- 'digits non zero' 
+-- |'pDigitNonZero' ~=> @[1-9]@
 pDigitNonZero :: Parser Char
 pDigitNonZero = pRange ('1','9')
 
--- 'alphanumeric'
+-- |'pAlphaNumeric' ~=> @[a-zA-Z0-9]@
 pAlphaNumeric :: Parser Char
 pAlphaNumeric = pLower <|> pUpper <|> pDigit
 
--- 'whitespace'
-whitespace :: String
-whitespace = " \r\n\t"
-
+-- |'pSpace' ~=> @[ \\r\\n\\t]@
 pSpace :: Parser Char
-pSpace = pAnySym whitespace
+pSpace = pAnySym " \r\n\t" <?> "<single-whitespace>"
 
+-- |'pSpaces1' ~=> @[ \\r\\n\\t]+@
 pSpaces1 :: Parser String
 pSpaces1 = pList1 pSpace
 
--- 'line terminators'
-lineterm :: String
-lineterm = "\r\n"
-
+-- |'pLineTerm' ~=> @[\\r\\n]@
 pLineTerm :: Parser Char
-pLineTerm = pAnySym lineterm
+pLineTerm = pAnySym "\r\n"
 
--- 'symbol characters'
+-- | Special symbol characters @~!\@$%^&*_-+=\<>.?\/@
 symchars :: String
-symchars = "~!@$%^&*_-+=<>.?"
+symchars = "~!@$%^&*_-+=<>.?/"
 
+-- | 'pSymChar' ~=> @[a-zA-Z0-9~!\@$%^&*_-+=\<>.?\/]@
 pSymChar :: Parser Char
 pSymChar = pAlphaNumeric <|> pAnySym symchars
 
+-- | 'pSymCharAlpha' ~=> @[a-zA-Z~!\@$%^&*_-+=\<>.?\/]@
 pSymCharAlpha :: Parser Char
 pSymCharAlpha = pLower <|> pUpper <|> pAnySym symchars
 
--- 'smt-lib character'
+-- | 'pCharQSym' parses a quote symbol character.
+pCharQSym :: Parser Char
+pCharQSym = pSpace <|> pRange ('\033','\091') <|> pRange ('\093','\123') <|> pRange ('\125','\126')
+
+-- | 'pChar' parses a @smt-lib@ character.
 pChar :: Parser Char
 pChar = pRange ('\033','\126') <|> pSpace
 
--- characters for quoted symbols
-pCharQSym :: Parser Char
-pCharQSym = pSpace <|> pRange ('\033','\091') <|> pRange ('\093','\123') <|> pRange ('\125','\126')
 
