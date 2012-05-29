@@ -4,15 +4,17 @@ import Data.Sequence
 
 type SMod = [SExpression] -- One or more SExpr
 
-data SExpression = Token    SToken
-                 | SeqSExpr [SExpression] 
-    deriving Show
+type SExpression = SCmd
 
-data SToken = LitToken SLiteral
-            | ResToken SReserved
-            | SymToken SSymbol
-            | KeyToken SKeyword
-    deriving Show
+-- data SExpression = Token    SToken
+--                  | SeqSExpr [SExpression] 
+--     deriving Show
+-- 
+-- data SToken = LitToken SLiteral
+--             | ResToken SReserved
+--             | SymToken SSymbol
+--             | KeyToken SKeyword
+--     deriving Show
     
 -- The semantics of literals changes
 -- with the Logic.
@@ -23,21 +25,21 @@ data SLiteral = NumLit SNumeral
               | StrLit SString
     deriving Show
 
-data SReserved = ResWrd SResWrd
-               | Cmd    SCmd
-    deriving Show
-    
-data SResWrd = RWpar
-             | RWNUMERAL
-             | RWDECIMAL
-             | RWSTRING
-             | RW_
-             | RWExclMark
-             | RWas
-             | RWlet
-             | RWforall
-             | RWexists
-    deriving Show         
+-- data SReserved = ResWrd SResWrd
+--                | Cmd    SCmd
+--     deriving Show
+--     
+-- data SResWrd = RWpar
+--              | RWNUMERAL
+--              | RWDECIMAL
+--              | RWSTRING
+--              | RW_
+--              | RWExclMark
+--              | RWas
+--              | RWlet
+--              | RWforall
+--              | RWexists
+--     deriving Show         
 
 data SCmd = SetLogic     SLogic
           | DeclFun      SSymbol [SSortExpr] SSortExpr

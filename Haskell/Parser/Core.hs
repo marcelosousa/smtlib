@@ -22,7 +22,8 @@ liftToken :: String -> a -> Parser a
 liftToken s c = const c <$> pToken s
   
 pSMod :: Parser SMod
-pSMod = pList1 pSExpression <?> "<module>"
+--pSMod = pList1 pSExpression <?> "<module>"
+pSMod = pList1 (ptSExpr pSCmd) <?> "<module>"
 
 -- Take out comments
 ptSExpr :: ParserTrafo a a
@@ -33,19 +34,19 @@ ptSExpr' p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpace
           <|> pSpaces *> p <* pSpaces
           
 -- <S-expr> 
-pSExpression :: Parser SExpression
-pSExpression =  Token    <$> pSToken 
-            <|> SeqSExpr <$> ptSExpr (pList pSExpression) 
-            <?> "<S-expr>"
-
--- <token>
-pSToken :: Parser SToken
-pSToken =  LitToken <$> pSLiteral
-       <|> ResToken <$> pSReserved
---       <|> SymToken <$> pSSymbol
-       <|> KeyToken <$> pSKeyword
-       <?> "<token>"
-
+-- pSExpression :: Parser SExpression
+-- pSExpression =  Token    <$> pSToken 
+--             <|> SeqSExpr <$> ptSExpr (pList pSExpression) 
+--             <?> "<S-expr>"
+-- 
+-- -- <token>
+-- pSToken :: Parser SToken
+-- pSToken =  LitToken <$> pSLiteral
+--        <|> ResToken <$> pSReserved
+-- --       <|> SymToken <$> pSSymbol
+--        <|> KeyToken <$> pSKeyword
+--        <?> "<token>"
+-- 
 -- <literal>
 pSLiteral :: Parser SLiteral
 pSLiteral =  NumLit <$> pSNumeral
@@ -62,32 +63,29 @@ cmdNames = ["assert","check-sat","declare-fun","declare-sort"
          ,"get-unsat-core","get-value","pop","push","set-info"
          ,"set-logic","set-option"]
 
-reswrd :: [(String, SResWrd)]
-reswrd = [("par"     , RWpar     )
-         ,("NUMERAL" , RWNUMERAL )     
-         ,("DECIMAL" , RWDECIMAL )     
-         ,("STRING"  , RWSTRING  )     
-         ,("_"       , RW_       )     
-         ,("!"       , RWExclMark)     
-         ,("as"      , RWas      )     
-         ,("let"     , RWlet     )     
-         ,("forall"  , RWforall  )     
-         ,("exists"  , RWexists  )]   
+--reswrd :: [(String, SResWrd)]
+--reswrd = [("par"     , RWpar     )
+--         ,("NUMERAL" , RWNUMERAL )     
+--         ,("DECIMAL" , RWDECIMAL )     
+--         ,("STRING"  , RWSTRING  )     
+--         ,("_"       , RW_       )     
+--         ,("!"       , RWExclMark)     
+--         ,("as"      , RWas      )     
+--         ,("let"     , RWlet     )     
+--         ,("forall"  , RWforall  )     
+--         ,("exists"  , RWexists  )]   
 
 reswrds :: [String]
-reswrds = cmdNames ++ (fst $ unzip reswrd)
+reswrds = cmdNames -- ++ (fst $ unzip reswrd)
 
-pSReserved :: Parser SReserved
-pSReserved =  ResWrd <$> pSResWord
-          <|> Cmd    <$> pSCmd
-          <?> "<reserved>"
-          
-pSResWord :: Parser SResWrd
-pSResWord =  pAny (uncurry liftToken) reswrd
-         <?> "<reserved-not-command>"
-
-app :: (c -> d) -> a -> b -> c -> d
-app f _ _ c = f c
+--pSReserved :: Parser SReserved
+--pSReserved =  ResWrd <$> pSResWord
+--          <|> Cmd    <$> pSCmd
+--          <?> "<reserved>"
+--          
+--pSResWord :: Parser SResWrd
+--pSResWord =  pAny (uncurry liftToken) reswrd
+--         <?> "<reserved-not-command>"
 
 -- * SMT Commands *
 -- SMT Commands without arguments
