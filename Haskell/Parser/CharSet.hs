@@ -24,8 +24,8 @@ whitespace = " \r\n\t"
 pSpace :: Parser Char
 pSpace = pAnySym whitespace
 
-pSpaces' :: Parser String
-pSpaces' = pList1 pSpace
+pSpaces1 :: Parser String
+pSpaces1 = pList1 pSpace
 
 -- 'line terminators'
 lineterm :: String

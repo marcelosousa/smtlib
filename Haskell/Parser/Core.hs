@@ -20,7 +20,7 @@ import Text.ParserCombinators.UU.Demo.Examples (run)
 
 liftToken :: String -> a -> Parser a
 liftToken s c = const c <$> pToken s
-
+  
 pSMod :: Parser SMod
 pSMod = pList1 pSExpression <?> "<module>"
 
@@ -29,8 +29,9 @@ ptSExpr :: ParserTrafo a a
 ptSExpr p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces
 
 ptSExpr' :: ParserTrafo a a
-ptSExpr' p =  pSpaces' *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces'
-         
+ptSExpr' p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces
+          <|> pSpaces *> p <* pSpaces
+          
 -- <S-expr> 
 pSExpression :: Parser SExpression
 pSExpression =  Token    <$> pSToken 
@@ -98,42 +99,45 @@ scmd0arg = [("get-assertions", GetAsserts)
            ,("exit"          , Exit)]
 
 liftCmd :: (a -> b) -> String -> Parser a -> Parser b
-liftCmd con scon pb = con <$> pToken scon **> pSpaces' **> pb
+liftCmd con scon pb = con <$> pToken scon **> pSpaces1 **> pb
 
 pSCmd :: Parser SCmd
 pSCmd =  pAny (uncurry liftToken) scmd0arg 
-     <|> SetLogic <$> pToken "set-logic"    **> pSpaces' **> pSLogic
-     <|> Assert   <$> pToken "assert"       **> pSpaces' **> pSExpr
-     <|> GetValue <$> pToken "get-value"    **> pSpaces' **> ptSExpr (pList1 pSExpr)
-     <|> Pop      <$> pToken "pop"          **> pSpaces' **> pSNumeral
-     <|> Push     <$> pToken "push"         **> pSpaces' **> pSNumeral
-     <|> GetOpt   <$> pToken "get-option"   **> pSpaces' **> pSKeyword
-     <|> SetOpt   <$> pToken "set-option"   **> pSpaces' **> pSKeyword <*> pSpaces' **> pSAttrValue
-     <|> GetInfo  <$> pToken "get-info"     **> pSpaces' **> pSKeyword
-     <|> SetInfo  <$> pToken "set-info"     **> pSpaces' **> pSKeyword <*> pSpaces' **> pSAttrValue
-     <|> DeclFun  <$> pToken "declare-fun"  **> pSpaces' **> pSSymbol <*> ptSExpr (pList pSSortExpr) <*> pSSortExpr
-     <|> DefFun   <$> pToken "define-fun"   **> pSpaces' **> pSSymbol <*> ptSExpr (ptSExpr $ pList $ (,) <$> pSSymbol <*> pSSortExpr) <*> pSSortExpr <*> pSpaces' **> pSExpr
-     <|> DeclSort <$> pToken "declare-sort" **> pSpaces' **> pSSymbol <*> pSpaces' **> pSNumeral
-     <|> DefSort  <$> pToken "define-sort"  **> pSpaces' **> pSSymbol <*> ptSExpr (pList1 pSSymbol) <*> pSExpr
+     <|> SetLogic <$> pToken "set-logic"    **> pSpaces1 **> pSLogic
+     <|> Assert   <$> pToken "assert"       **> pSpaces1 **> pSExpr
+     <|> GetValue <$> pToken "get-value"    **> pSpaces1 **> ptSExpr (pList1 pSExpr)
+     <|> Pop      <$> pToken "pop"          **> pSpaces1 **> pSNumeral
+     <|> Push     <$> pToken "push"         **> pSpaces1 **> pSNumeral
+     <|> GetOpt   <$> pToken "get-option"   **> pSpaces1 **> pSKeyword
+     <|> SetOpt   <$> pToken "set-option"   **> pSpaces1 **> pSKeyword <*> pSpaces1 **> pSAttrValue
+     <|> GetInfo  <$> pToken "get-info"     **> pSpaces1 **> pSKeyword
+     <|> SetInfo  <$> pToken "set-info"     **> pSpaces1 **> pSKeyword <*> pSpaces1 **> pSAttrValue
+     <|> DeclFun  <$> pToken "declare-fun"  **> pSpaces1 **> pSSymbol <*> ptSExpr (pList pSSortExpr) <*> pSSortExpr
+     <|> DefFun   <$> pToken "define-fun"   **> pSpaces1 **> pSSymbol <*> ptSExpr (ptSExpr $ pList $ (,) <$> pSSymbol <*> pSSortExpr) <*> pSSortExpr <*> pSpaces1 **> pSExpr
+     <|> DeclSort <$> pToken "declare-sort" **> pSpaces1 **> pSSymbol <*> pSpaces1 **> pSNumeral
+     <|> DefSort  <$> pToken "define-sort"  **> pSpaces1 **> pSSymbol <*> ptSExpr (pList1 pSSymbol) <*> pSExpr
      <?> "<command>"
 
 -- pLogic
 pSLogic :: Parser SLogic
 pSLogic = read <$> pList1 pSymChar
- 
+
 pSExpr :: Parser SExpr
-pSExpr =  LitExpr    <$> pSLiteral
-      <|> IdentExpr  <$> pSIdent
-      <|> FnAppExpr  <$> pSIdent <* pSpaces <*> pList1 pSExpr
-      <|> ForallExpr <$> pToken "forall" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces **> pSExpr
-      <|> ExistsExpr <$> pToken "exists" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces **> pSExpr
-      <|> LetExpr    <$> pToken "let"    **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces **> pSExpr
-      <|> AttrExpr   <$> pToken "!"      **> pSpaces **> pSExpr <*> pList1 (pSpaces **> pSAttribute)
-      <?> "<expr>" 
+pSExpr = ptSExpr' pSExpr'
+
+pSExpr' :: Parser SExpr
+pSExpr' =  LitExpr    <$> pSLiteral
+       <|> IdentExpr  <$> pSIdent
+       <|> FnAppExpr  <$> pSIdent <*> pList1 (pSpaces1 *> pSExpr)
+       <|> ForallExpr <$> pToken "forall" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
+       <|> ExistsExpr <$> pToken "exists" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
+       <|> LetExpr    <$> pToken "let"    **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
+       <|> AttrExpr   <$> pToken "!"      **> pSpaces1 **> pSExpr <*> pList1 (pSpaces1 **> pSAttribute)
+       <?> "<expr>" 
      
 pSAttribute :: Parser SAttribute
 pSAttribute =  AttrKey      <$> pSKeyword
-           <|> AttrKeyValue <$> pSKeyword <*> pSpaces **> pSAttrValue
+           <|> AttrKeyValue <$> pSKeyword <*> pSpaces1 **> pSAttrValue
 
 pSAttrValue :: Parser SAttrValue
 pSAttrValue = pList1 pSymChar
@@ -141,7 +145,7 @@ pSAttrValue = pList1 pSymChar
 pSIdent :: Parser SIdent
 pSIdent =  SymIdent <$> pSSymbol
        <|> IdxIdent <$> pToken "_" **> pSpaces **> pSSymbol <*> pList1 (pSpaces **> pSNumeral)
-       <|> QlfIdent <$> pToken "as" **> pSpaces **> pSIdent <*> pSpaces **> pSSort
+       <|> QlfIdent <$> pToken "as" **> pSpaces **> pSIdent <*> pSpaces1 **> pSSort
        <?> "<identifier>"
                
 pSSort :: Parser SSort
