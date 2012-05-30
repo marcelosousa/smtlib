@@ -1,8 +1,6 @@
 {-#LANGUAGE FlexibleContexts #-}
 
-{-| The module "Parser.CharSet" contains parsers for several character sets.
-    Copyright : (c) 2012 Marcelo Sousa <dipython@gmail.com>
--}
+-- | The module "Parser.CharSet" contains parsers for several character sets.
 module Parser.CharSet where
 
 import Text.ParserCombinators.UU.BasicInstances
@@ -28,6 +26,14 @@ pSpaces1 = pList1 pSpace
 -- |'pLineTerm' ~=> @[\\r\\n]@
 pLineTerm :: Parser Char
 pLineTerm = pAnySym "\r\n"
+
+-- | 'pCharString' parses any @smt-lib@ escaping \\ and \".
+pCharString :: Parser Char
+pCharString =  pSym '!'
+           <|> curry snd <$> pSym '\\' <*> pAnySym "\\\""
+           <|> pRange ('\035','\091') 
+           <|> pRange ('\093','\126') 
+           <|> pSpace
 
 -- | Special symbol characters @~!\@$%^&*_-+=\<>.?\/@
 symchars :: String

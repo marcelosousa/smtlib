@@ -8,7 +8,7 @@ module Parser.Core where
   
 import SMTLib2.Base
 
-import Parser.Base
+import Parser.Token
 import Parser.CharSet
 
 import Control.Monad
@@ -56,28 +56,6 @@ pSLiteral =  NumLit <$> pSNumeral
          <|> HexLit <$> pSHex
          <|> StrLit <$> pString
          <?> "<literal>"
-
-cmdNames :: [String]
-cmdNames = ["assert","check-sat","declare-fun","declare-sort"
-         ,"define-fun","define-sort","exit","get-assertions"
-         ,"get-assignment","get-info","get-option","get-proof"
-         ,"get-unsat-core","get-value","pop","push","set-info"
-         ,"set-logic","set-option"]
-
---reswrd :: [(String, SResWrd)]
---reswrd = [("par"     , RWpar     )
---         ,("NUMERAL" , RWNUMERAL )     
---         ,("DECIMAL" , RWDECIMAL )     
---         ,("STRING"  , RWSTRING  )     
---         ,("_"       , RW_       )     
---         ,("!"       , RWExclMark)     
---         ,("as"      , RWas      )     
---         ,("let"     , RWlet     )     
---         ,("forall"  , RWforall  )     
---         ,("exists"  , RWexists  )]   
-
-reswrds :: [String]
-reswrds = cmdNames -- ++ (fst $ unzip reswrd)
 
 --pSReserved :: Parser SReserved
 --pSReserved =  ResWrd <$> pSResWord
@@ -145,35 +123,11 @@ pSIdent =  SymIdent <$> pSSymbol
        <?> "<identifier>"
                
 pSSort :: Parser SSort
-pSSort = Sort <$> pList1 pSymChar <?> "<sort>"
+pSSort = pList1 pSymChar <?> "<sort>"
 
 pSSortExpr :: Parser SSortExpr
 pSSortExpr =  SymSort <$> pSSort
           <|> ptSExpr (FunSort <$> pSSymbol <*> pSpaces **> pList1 pSSortExpr)
           <?> "<sort-expr>"
           
--- <symbol>
-pSSymbol :: Parser SSymbol
-pSSymbol =  SimpleSym <$> pSymSimple'  
-        <|> QuotedSym <$> pSymQuoted          
-        <?> "<symbol>"
-
--- <simple-symbol> 
-pSymSimple' :: Parser SimpleSym
-pSymSimple' = (:) <$> pSymCharAlpha <*> pList pSymChar
-
-pSymSimple :: Parser SimpleSym
-pSymSimple = do x <- pSymSimple'
-                if elem x reswrds 
-                then pFail 
-                else pReturn x
-
--- <quoted-symbol>
-pSymQuoted :: Parser QuotedSym
-pSymQuoted = pSym '|' *> pList pCharQSym <* pSym '|'
-
--- <keyword>
-pSKeyword :: Parser SKeyword
-pSKeyword = Keyword <$> pSym ':' **> pList1 pSymChar
-
           

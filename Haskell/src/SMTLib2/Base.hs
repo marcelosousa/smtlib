@@ -74,8 +74,7 @@ data SSortExpr = SymSort SSort
                | FunSort SSymbol [SSortExpr]
     deriving Show
     
-data SSort = Sort String
-    deriving Show
+type SSort = String
 
 -- Token Types
 data TokenTy = NumeralTy
