@@ -11,9 +11,9 @@ instance Pretty SCmd where
   pretty (SetLogic logic)               = text "set-logic"   <+> pretty logic
   pretty (DeclFun  sym exprs expr)      = text "declare-fun" <+> pretty sym <+> parens (pretty exprs) <+> pretty expr
   pretty (DefFun   sym exprs sort expr) = text "define-fun"  <+> pretty sym <+> parens (pretty exprs) <+> pretty sort <+> pretty expr
-  pretty (DeclSort sym num)             = text "declare-sort"<+> pretty sym <+> pretty snum
+  pretty (DeclSort sym num)             = text "declare-sort"<+> pretty sym <+> pretty num
   pretty (DefSort  sym syms expr)       = text "define-sort" <+> pretty sym <+> parens (pretty syms)  <+> pretty expr
-  pretty (Assert   sexpr)               = text "assert"      <+> pretty expr
+  pretty (Assert   expr)                = text "assert"      <+> pretty expr
   pretty GetAsserts                     = text "get-assertions"
   pretty CheckSat                       = text "check-sat"
   pretty GetProof                       = text "get-proof"
@@ -40,8 +40,12 @@ instance Pretty SSortExpr where
 instance Pretty SExpr where
   pretty expr = undefined
 
-instance Pretty SAttrValue where
-  pretty attrval = undefined
+--instance Pretty SAttrValue where
+--  pretty attrval = undefined
+
+instance Pretty SKeyword where
+  pretty = undefined
+  
 {-  
   data SCmd = SetLogic     SLogic
             | DeclFun      SSymbol [SSortExpr] SSortExpr

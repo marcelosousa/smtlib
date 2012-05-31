@@ -13,6 +13,7 @@ Executable smtlib
                     , containers    >= 0.2
                     , filepath
                     , uu-parsinglib >= 2.7.1
+                    , uulib
                     , cmdargs
     Hs-Source-Dirs:   src/
     Extensions: 	  FlexibleContexts, DoAndIfThenElse
