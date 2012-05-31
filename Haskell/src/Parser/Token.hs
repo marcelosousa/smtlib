@@ -42,19 +42,22 @@ pBDigit = pSym '0' <|> pSym '1'
 
 -- | 'pSBinary' ~=> @#b[01]+@. We consider <binary> as a string.
 pSBinary :: Parser SBinary
-pSBinary = (++) <$> pToken "#b" <*> pList1 pBDigit <?> "<binary>"
-  
+--pSBinary = (++) <$> pToken "0b" <*> pList1 pBDigit <?> "<binary>"
+pSBinary = pToken "0b" **> pList1 pBDigit <?> "<binary>"
+
 -- | 'pHDigit' ~=> @[0-9a-fA-F]@
 pHDigit :: Parser HDigit
 pHDigit = pDigit <|> pRange ('a','f') <|> pRange ('A','F')
 
 -- | 'pSHex' ~=> @#x[0-9a-fA-F]@. We consider <hex> as a string.
 pSHex :: Parser SHex
-pSHex = (++) <$> pToken "#x" <*> pList1 pHDigit <?> "<hex>"
+--pSHex = (++) <$> pToken "0x" <*> pList1 pHDigit <?> "<hex>"
+pSHex = pToken "0x" **> pList1 pHDigit <?> "<hex>"
   
 -- | 'pString' parses a sequence of 'pCharString' enclosed in \".
 pString :: Parser String 
-pString = (\b s e -> show b ++ s ++ show e) <$> pSym '"' <*> pList pCharString <*> pSym '"' <?> "<string>"
+--pString = (\b s e -> show b ++ s ++ show e) <$> pSym '"' <*> pList pCharString <*> pSym '"' <?> "<string>"
+pString = (\b s e -> s) <$> pSym '"' <*> pList pCharString <*> pSym '"' <?> "<string>"
  
 -- | 'pSLiteral' parses any literal.
 pSLiteral :: Parser SLiteral

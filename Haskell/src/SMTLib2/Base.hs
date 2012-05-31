@@ -107,7 +107,7 @@ type SimpleSym = String
 type QuotedSym = String
 type ReservSym = String
 
-data SKeyword  = Keyword String
+newtype SKeyword  = Keyword String
     deriving Show
     
 -- 3.6 Attributes 
@@ -115,7 +115,7 @@ data SAttribute = AttrKey      SKeyword
                 | AttrKeyValue SKeyword SAttrValue
     deriving Show
     
-type SAttrValue = String -- SExpression
+type SAttrValue = String -- SExpression that is not a keyword
 
 -- 3.7 Expressions (<expr>)
 data SExpr = LitExpr    SLiteral
