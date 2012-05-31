@@ -1,4 +1,5 @@
 {-#LANGUAGE FlexibleInstances #-}
+{-#LANGUAGE TypeSynonymInstances #-}
 
 module Printer.PPrinter where
 
@@ -36,6 +37,9 @@ instance SMTPretty [SAttribute] where
 instance SMTPretty [SNumeral] where
   spretty = hsep . map pretty
 
+instance SMTPretty SMod where
+  spretty = vsep . map pretty
+  
 -- Pretty instances
 instance Pretty SExpression where
   pretty (SE expr) = parens $ pretty expr
