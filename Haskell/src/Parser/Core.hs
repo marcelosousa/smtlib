@@ -24,7 +24,7 @@ liftToken s c = const c <$> pToken s
   
 pSMod :: Parser SMod
 --pSMod = pList1 pSExpression <?> "<module>"
-pSMod = pList1 (ptSExpr pSCmd) <?> "<module>"
+pSMod = pList1 (SE <$> ptSExpr pSCmd) <?> "<module>"
 
 pLParen, pRParen :: Parser Char
 pLParen = pSym '('

@@ -4,7 +4,8 @@ import Data.Sequence
 
 type SMod = [SExpression] -- One or more SExpr
 
-type SExpression = SCmd
+newtype SExpression = SE SCmd
+    deriving Show
 
 -- data SExpression = Token    SToken
 --                  | SeqSExpr [SExpression] 
