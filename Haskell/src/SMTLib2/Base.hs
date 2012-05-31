@@ -41,7 +41,7 @@ data SLiteral = NumLit SNumeral
 --              | RWforall
 --              | RWexists
 --     deriving Show         
-
+ 
 data SCmd = SetLogic     SLogic
           | DeclFun      SSymbol [SSortExpr] SSortExpr
           | DefFun       SSymbol [(SSymbol,SSortExpr)] SSortExpr SExpr
