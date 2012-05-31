@@ -35,6 +35,15 @@ pCharString =  pSym '!'
            <|> pRange ('\093','\126') 
            <|> pSpace
 
+-- | Reserved words.
+reswrds :: [String]
+reswrds = ["assert","check-sat","declare-fun","declare-sort"
+         ,"define-fun","define-sort","exit","get-assertions"
+         ,"get-assignment","get-info","get-option","get-proof"
+         ,"get-unsat-core","get-value","pop","push","set-info"
+         ,"set-logic","set-option","par","NUMERAL","DECIMAL"
+         ,"STRING","_","!","as","let","forall","exists"]
+
 -- | Special symbol characters @~!\@$%^&*_-+=\<>.?\/@
 symchars :: String
 symchars = "~!@$%^&*_-+=<>.?/"

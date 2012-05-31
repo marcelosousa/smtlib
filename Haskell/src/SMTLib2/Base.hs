@@ -99,10 +99,12 @@ type SString = String
 
 data SSymbol = SimpleSym SimpleSym
              | QuotedSym QuotedSym
+             | ReservSym ReservSym -- ^ We add an extra constructor for reserved words
     deriving Show
     
 type SimpleSym = String
 type QuotedSym = String
+type ReservSym = String
 
 data SKeyword  = Keyword String
     deriving Show

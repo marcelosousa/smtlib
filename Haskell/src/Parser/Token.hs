@@ -58,45 +58,26 @@ pString = (\b s e -> show b ++ s ++ show e) <$> pSym '"' <*> pList pCharString <
 
 -- | 'pSSymbol' parses a 'SSymbol'.
 pSSymbol :: Parser SSymbol
-pSSymbol =  SimpleSym <$> pSymSimple'  
-        <|> QuotedSym <$> pSymQuoted          
+pSSymbol =  SimpleSym <$> pSimpleSym
+        <|> QuotedSym <$> pQuotedSym
+        <|> ReservSym <$> pReservSym
         <?> "<symbol>"
 
-cmdNames :: [String]
-cmdNames = ["assert","check-sat","declare-fun","declare-sort"
-         ,"define-fun","define-sort","exit","get-assertions"
-         ,"get-assignment","get-info","get-option","get-proof"
-         ,"get-unsat-core","get-value","pop","push","set-info"
-         ,"set-logic","set-option"]
+-- | 'pReservSym' parses a reserved word.
+pReservSym :: Parser ReservSym
+pReservSym = pAny pToken reswrds `micro` 1
 
---reswrd :: [(String, SResWrd)]
---reswrd = [("par"     , RWpar     )
---         ,("NUMERAL" , RWNUMERAL )     
---         ,("DECIMAL" , RWDECIMAL )     
---         ,("STRING"  , RWSTRING  )     
---         ,("_"       , RW_       )     
---         ,("!"       , RWExclMark)     
---         ,("as"      , RWas      )     
---         ,("let"     , RWlet     )     
---         ,("forall"  , RWforall  )     
---         ,("exists"  , RWexists  )]   
-
-reswrds :: [String]
-reswrds = cmdNames -- ++ (fst $ unzip reswrd)
-
--- <simple-symbol> 
-pSymSimple' :: Parser SimpleSym
-pSymSimple' = (:) <$> pSymCharAlpha <*> pList pSymChar
-
-pSymSimple :: Parser SimpleSym
-pSymSimple = do x <- pSymSimple'
-                if elem x reswrds 
-                then pFail 
-                else pReturn x
+-- | 'pSymSimple' parses a non-empty sequence of symbol characters, not beginning with a digit, and not a reserved word.
+pSimpleSym :: Parser SimpleSym
+pSimpleSym = (:) <$> pSymCharAlpha <*> pList pSymChar `micro` 2
+-- do x <- (:) <$> pSymCharAlpha <*> pList pSymChar
+--                if elem x reswrds 
+--                then pFail
+--                else pReturn x
 
 -- | 'pSymQuoted' parses a sequence of smt-lib characters non including \\ and \|, inclosed in \| characters.
-pSymQuoted :: Parser QuotedSym
-pSymQuoted = pSym '|' *> pList pCharQSym <* pSym '|'
+pQuotedSym :: Parser QuotedSym
+pQuotedSym = pSym '|' *> pList pCharQSym <* pSym '|'
 
 -- | 'pSKeyword' parses a colon followed by a non-empty sequence of symbol characters.
 pSKeyword :: Parser SKeyword
