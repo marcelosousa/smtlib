@@ -122,7 +122,7 @@ data SExpr = LitExpr    SLiteral
            | FnAppExpr  SIdent [SExpr]
            | ForallExpr [(SSymbol, SSort)] SExpr
            | ExistsExpr [(SSymbol, SSort)] SExpr
-           | LetExpr    [(SSymbol, SSort)] SExpr
+           | LetExpr    [(SSymbol, SExpr)] SExpr
            | AttrExpr   SExpr [SAttribute]
     deriving Show
 

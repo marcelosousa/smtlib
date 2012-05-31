@@ -55,6 +55,25 @@ pSHex = (++) <$> pToken "#x" <*> pList1 pHDigit <?> "<hex>"
 -- | 'pString' parses a sequence of 'pCharString' enclosed in \".
 pString :: Parser String 
 pString = (\b s e -> show b ++ s ++ show e) <$> pSym '"' <*> pList pCharString <*> pSym '"' <?> "<string>"
+ 
+-- | 'pSLiteral' parses any literal.
+pSLiteral :: Parser SLiteral
+pSLiteral =  NumLit <$> pSNumeral
+         <|> DecLit <$> pSDecimal
+         <|> BinLit <$> pSBinary
+         <|> HexLit <$> pSHex
+         <|> StrLit <$> pString
+         <?> "<literal>"
+
+--pSReserved :: Parser SReserved
+--pSReserved =  ResWrd <$> pSResWord
+--          <|> Cmd    <$> pSCmd
+--          <?> "<reserved>"
+--          
+--pSResWord :: Parser SResWrd
+--pSResWord =  pAny (uncurry liftToken) reswrd
+--         <?> "<reserved-not-command>"
+
 
 -- | 'pSSymbol' parses a 'SSymbol'.
 pSSymbol :: Parser SSymbol
@@ -82,3 +101,11 @@ pQuotedSym = pSym '|' *> pList pCharQSym <* pSym '|'
 -- | 'pSKeyword' parses a colon followed by a non-empty sequence of symbol characters.
 pSKeyword :: Parser SKeyword
 pSKeyword = Keyword <$> pSym ':' **> pList1 pSymChar
+
+-- -- <token>
+-- pSToken :: Parser SToken
+-- pSToken =  LitToken <$> pSLiteral
+--        <|> ResToken <$> pSReserved
+-- --       <|> SymToken <$> pSSymbol
+--        <|> KeyToken <$> pSKeyword
+--        <?> "<token>"

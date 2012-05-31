@@ -15,7 +15,7 @@ import Control.Monad
 import Debug.Trace
 
 import Text.ParserCombinators.UU hiding (parse, (<$$>))
-import Text.ParserCombinators.UU.Utils
+import Text.ParserCombinators.UU.Utils hiding (pLParen, pRParen)
 import Text.ParserCombinators.UU.BasicInstances
 import Text.ParserCombinators.UU.Demo.Examples (run)
 
@@ -26,45 +26,23 @@ pSMod :: Parser SMod
 --pSMod = pList1 pSExpression <?> "<module>"
 pSMod = pList1 (ptSExpr pSCmd) <?> "<module>"
 
+pLParen, pRParen :: Parser Char
+pLParen = pSym '('
+pRParen = pSym ')'
+
 -- Take out comments
 ptSExpr :: ParserTrafo a a
 ptSExpr p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces
 
-ptSExpr' :: ParserTrafo a a
-ptSExpr' p =  trace "Bah" $ pSpaces1 *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces
-          <|> pSpaces *> p <* pSpaces
-          
+pEncSExpr :: ParserTrafo a a
+pEncSExpr p = pLParen *> pSpaces *> p <* pSpaces <* pRParen
+
 -- <S-expr> 
 -- pSExpression :: Parser SExpression
 -- pSExpression =  Token    <$> pSToken 
 --             <|> SeqSExpr <$> ptSExpr (pList pSExpression) 
 --             <?> "<S-expr>"
 -- 
--- -- <token>
--- pSToken :: Parser SToken
--- pSToken =  LitToken <$> pSLiteral
---        <|> ResToken <$> pSReserved
--- --       <|> SymToken <$> pSSymbol
---        <|> KeyToken <$> pSKeyword
---        <?> "<token>"
--- 
--- <literal>
-pSLiteral :: Parser SLiteral
-pSLiteral =  NumLit <$> pSNumeral
-         <|> DecLit <$> pSDecimal
-         <|> BinLit <$> pSBinary
-         <|> HexLit <$> pSHex
-         <|> StrLit <$> pString
-         <?> "<literal>"
-
---pSReserved :: Parser SReserved
---pSReserved =  ResWrd <$> pSResWord
---          <|> Cmd    <$> pSCmd
---          <?> "<reserved>"
---          
---pSResWord :: Parser SResWrd
---pSResWord =  pAny (uncurry liftToken) reswrd
---         <?> "<reserved-not-command>"
 
 -- * SMT Commands *
 -- SMT Commands without arguments
@@ -101,14 +79,14 @@ pSLogic = read <$> pList1 pSymChar
 
 pSExpr :: Parser SExpr
 pSExpr =  LitExpr    <$> pSLiteral
-      <|> IdentExpr  <$> pSpaces **> pSIdent
-      <|> ptSExpr (FnAppExpr  <$> pSIdent <*> pSpaces1 **> pList1 pSExpr)
---      <|> ForallExpr <$> pToken "forall" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
---      <|> ExistsExpr <$> pToken "exists" **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
---      <|> LetExpr    <$> pToken "let"    **> ptSExpr (ptSExpr $ pList1 $ (,) <$> pSSymbol <*> pSSort) <*> pSpaces1 **> pSExpr
---      <|> AttrExpr   <$> pToken "!"      **> pSpaces1 **> pSExpr <*> pList1 (pSpaces1 **> pSAttribute)
+      <|> IdentExpr  <$> pSIdent
+      <|> pEncSExpr (FnAppExpr  <$> pSIdent <*> pList1 (pSpaces1 **> pSExpr))
+      <|> pEncSExpr (ForallExpr <$> pToken "forall" **> pSpaces1 **> ptSExpr (pList1 $ ptSExpr $ (,) <$> pSSymbol <*> pSpaces1 **> pSSort) <*> pSExpr)
+      <|> pEncSExpr (ExistsExpr <$> pToken "exists" **> pSpaces1 **> ptSExpr (pList1 $ ptSExpr $ (,) <$> pSSymbol <*> pSpaces1 **> pSSort) <*> pSExpr)
+      <|> pEncSExpr (LetExpr    <$> pToken "let"    **> pSpaces1 **> ptSExpr (pList1 $ ptSExpr $ (,) <$> pSSymbol <*> pSpaces1 **> pSExpr) <*> pSExpr)
+      <|> pEncSExpr (AttrExpr   <$> pToken "!"      **> pSpaces1 **> pSExpr <*> pList1 (pSpaces1 **> pSAttribute))
       <?> "<expr>" 
-     
+  
 pSAttribute :: Parser SAttribute
 pSAttribute =  AttrKey      <$> pSKeyword
            <|> AttrKeyValue <$> pSKeyword <*> pSpaces1 **> pSAttrValue
@@ -118,8 +96,8 @@ pSAttrValue = pList1 pSymChar
 
 pSIdent :: Parser SIdent
 pSIdent =  SymIdent <$> pSSymbol
-       <|> IdxIdent <$> pToken "_" **> pSpaces **> pSSymbol <*> pList1 (pSpaces **> pSNumeral)
-       <|> QlfIdent <$> pToken "as" **> pSpaces **> pSIdent <*> pSpaces1 **> pSSort
+       <|> pEncSExpr (IdxIdent <$> pToken "_"  **> pSpaces1 **> pSSymbol <*> pList1 (pSpaces1 **> pSNumeral))
+       <|> pEncSExpr (QlfIdent <$> pToken "as" **> pSpaces1 **> pSIdent  <*> pSpaces1 **> pSSort)
        <?> "<identifier>"
                
 pSSort :: Parser SSort
@@ -127,7 +105,7 @@ pSSort = pList1 pSymChar <?> "<sort>"
 
 pSSortExpr :: Parser SSortExpr
 pSSortExpr =  SymSort <$> pSSort
-          <|> ptSExpr (FunSort <$> pSSymbol <*> pSpaces **> pList1 pSSortExpr)
+          <|> pEncSExpr (FunSort <$> pSSymbol <*> pSpaces1 **> pList1 pSSortExpr)
           <?> "<sort-expr>"
           
           
