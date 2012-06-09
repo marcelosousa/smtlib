@@ -20,19 +20,18 @@ import Text.ParserCombinators.UU.BasicInstances
 import Text.ParserCombinators.UU.Demo.Examples (run)
 
 liftToken :: String -> a -> Parser a
-liftToken s c = const c <$> pToken s
-  
+liftToken s c = const c <$> pToken s  
+
 pSMod :: Parser SMod
 --pSMod = pList1 pSExpression <?> "<module>"
-pSMod = pList1 (SE <$> ptSExpr pSCmd) <?> "<module>"
+pSMod =  pList1 (SE <$> ptSExpr pSCmd <|> const Comment <$> pSpaces **> pCmt) <?> "<module>" 
 
 pLParen, pRParen :: Parser Char
 pLParen = pSym '('
 pRParen = pSym ')'
 
--- Take out comments
 ptSExpr :: ParserTrafo a a
-ptSExpr p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces
+ptSExpr p =  pSpaces *> pLParen *> pSpaces *> p <* pSpaces <* pRParen <* pSpaces <* pMaybe pCmt
 
 pEncSExpr :: ParserTrafo a a
 pEncSExpr p = pLParen *> pSpaces *> p <* pSpaces <* pRParen
@@ -71,6 +70,7 @@ pSCmd =  pAny (uncurry liftToken) scmd0arg
      <|> DefFun   <$> pToken "define-fun"   **> pSpaces1 **> pSSymbol <*> ptSExpr (ptSExpr $ pList $ (,) <$> pSSymbol <*> pSSortExpr) <*> pSSortExpr <*> pSpaces1 **> pSExpr
      <|> DeclSort <$> pToken "declare-sort" **> pSpaces1 **> pSSymbol <*> pSpaces1 **> pSNumeral
      <|> DefSort  <$> pToken "define-sort"  **> pSpaces1 **> pSSymbol <*> ptSExpr (pList1 pSSymbol) <*> pSExpr
+--     <|> const Comment  <$> pCmt
      <?> "<command>"
 
 -- pLogic
@@ -91,8 +91,8 @@ pSAttribute :: Parser SAttribute
 pSAttribute =  AttrKey      <$> pSKeyword
            <|> AttrKeyValue <$> pSKeyword <*> pSpaces1 **> pSAttrValue
 
-pSAttrValue :: Parser SAttrValue
-pSAttrValue = pList1 pSymChar
+pSAttrValue :: Parser SExpr
+pSAttrValue = pSExpr
 
 pSIdent :: Parser SIdent
 pSIdent =  SymIdent <$> pSSymbol

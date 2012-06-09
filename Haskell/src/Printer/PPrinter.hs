@@ -38,7 +38,7 @@ instance SMTPretty [SNumeral] where
   spretty = hsep . map pretty
 
 instance SMTPretty SMod where
-  spretty = vsep . map pretty
+  spretty smod = vsep (map pretty smod) <> char '\n'
   
 -- Pretty instances
 instance Pretty SExpression where
@@ -56,7 +56,7 @@ instance Pretty SCmd where
   pretty GetProof                       = text "get-proof"
   pretty GetUnsatCore                   = text "get-unsat-core"
   pretty (GetValue exprs)               = text "get-value" <+> parens (spretty exprs)
-  pretty GetAssign                      = text "get-assigment"
+  pretty GetAssign                      = text "get-assignment"
   pretty (Push num)                     = text "push" <+> pretty num
   pretty (Pop  num)                     = text "pop"  <+> pretty num
   pretty (GetOpt keywrd)                = text "get-option" <+> pretty keywrd

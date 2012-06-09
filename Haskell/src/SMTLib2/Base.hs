@@ -4,7 +4,8 @@ import Data.Sequence
 
 type SMod = [SExpression] -- One or more SExpr
 
-newtype SExpression = SE SCmd
+data SExpression = SE SCmd
+                 | Comment
     deriving Show
 
 -- data SExpression = Token    SToken
@@ -115,7 +116,7 @@ data SAttribute = AttrKey      SKeyword
                 | AttrKeyValue SKeyword SAttrValue
     deriving Show
     
-type SAttrValue = String -- SExpression that is not a keyword
+type SAttrValue = SExpr -- SExpression that is not a keyword
 
 -- 3.7 Expressions (<expr>)
 data SExpr = LitExpr    SLiteral

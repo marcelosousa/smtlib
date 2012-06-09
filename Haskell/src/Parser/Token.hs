@@ -19,6 +19,10 @@ infixl 5 **>
 (**>) :: Applicative f => f a -> f b -> f b
 p **> q = p *> q
 
+pCmt :: Parser Char
+pCmt = maybe ' ' id <$> pSym ';' **> pList (pSymChar <|> pSym ' ' <|> pSym '\t') **> pMaybe pLineTerm
+       
+
 -- digit2Num converts a char to a num.
 digit2Num :: Num a => Char -> a
 digit2Num a = fromInteger $ toInteger $ ord a - ord '0'

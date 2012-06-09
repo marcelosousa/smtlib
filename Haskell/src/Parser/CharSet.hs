@@ -21,7 +21,7 @@ pSpace = pAnySym " \r\n\t" <?> "<single-whitespace>"
 
 -- |'pSpaces1' ~=> @[ \\r\\n\\t]+@
 pSpaces1 :: Parser String
-pSpaces1 = pList1 pSpace
+pSpaces1 =  pList1 pSpace
 
 -- |'pLineTerm' ~=> @[\\r\\n]@
 pLineTerm :: Parser Char
