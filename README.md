@@ -3,6 +3,8 @@ smtlib
 
 SMT-Lib v2 Tools for Haskell and Agda
 
+Copyright 2012 @ Marcelo Sousa
+
 Benchmarks
 ~~~~~~~~~~
 
@@ -14,4 +16,4 @@ using query:
 
     logicfam='QF_UF/eq_diamond'
 
-Copyright 2012 @ Marcelo Sousa
+
