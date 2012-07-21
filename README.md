@@ -13,3 +13,5 @@ The benchmarks used on Haskell/tests were extracted from SMT-LIB on
 using query:
 
     logicfam='QF_UF/eq_diamond'
+
+Copyright 2012 @ Marcelo Sousa
