@@ -4,12 +4,12 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE EmptyDataDecls     #-}
 
-module Parser.Core where
+module Language.SMTLib2.Parser.Core where
   
-import SMTLib2.Base
+import Language.SMTLib2.Base
 
-import Parser.Token
-import Parser.CharSet
+import Language.SMTLib2.Parser.Token
+import Language.SMTLib2.Parser.CharSet
 
 import Control.Monad
 import Debug.Trace

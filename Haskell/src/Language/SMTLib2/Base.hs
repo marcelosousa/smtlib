@@ -1,4 +1,4 @@
-module SMTLib2.Base where
+module Language.SMTLib2.Base where
 
 import Data.Sequence
 

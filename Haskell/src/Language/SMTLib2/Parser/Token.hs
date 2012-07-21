@@ -1,13 +1,13 @@
 {-#LANGUAGE FlexibleContexts #-}
 
 -- | The module "Parser.Token" contains parsers for tokens.
-module Parser.Token where
+module Language.SMTLib2.Parser.Token where
 
 import Data.Char 
 
-import SMTLib2.Base
+import Language.SMTLib2.Base
 
-import Parser.CharSet
+import Language.SMTLib2.Parser.CharSet
 
 import Text.ParserCombinators.UU hiding (parse)
 import Text.ParserCombinators.UU.Utils

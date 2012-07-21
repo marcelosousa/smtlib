@@ -1,8 +1,8 @@
-module Parser where
+module Language.SMTLib2.Parser where
   
 import Text.ParserCombinators.UU.Utils (runParser)
 
-import Parser.Core
+import Language.SMTLib2.Parser.Core
 
 -- Run Parsers
 parse = runParser "Error" pSMod

@@ -1,8 +1,8 @@
 module Test where
 
-import SMTLib2
-import Parser
-import Printer
+import Language.SMTLib2
+import Language.SMTLib2.Parser
+import Language.SMTLib2.Printer
 import Test.HUnit
 import System.Directory
 import System.FilePath

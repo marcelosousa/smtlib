@@ -1,7 +1,7 @@
 {-#LANGUAGE FlexibleContexts #-}
 
 -- | The module "Parser.CharSet" contains parsers for several character sets.
-module Parser.CharSet where
+module Language.SMTLib2.Parser.CharSet where
 
 import Text.ParserCombinators.UU.BasicInstances
 import Text.ParserCombinators.UU.Utils

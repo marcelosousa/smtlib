@@ -1,11 +1,13 @@
 {-#LANGUAGE FlexibleInstances #-}
 {-#LANGUAGE TypeSynonymInstances #-}
 
-module Printer.PPrinter where
+module Language.SMTLib2.Printer where
 
-import SMTLib2.Base
-
+import Language.SMTLib2.Base
 import UU.PPrint
+
+prettyprint :: SMod -> Doc
+prettyprint = spretty
 
 class SMTPretty a where
   spretty :: a -> Doc

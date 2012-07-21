@@ -1,8 +1,8 @@
 module Main where
 
-import SMTLib2
-import Parser
-import Printer
+import Language.SMTLib2
+import Language.SMTLib2.Parser
+import Language.SMTLib2.Printer
 
 main :: IO ()
 main = putStrLn "SMT-Lib v2"

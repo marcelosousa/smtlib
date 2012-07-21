@@ -17,4 +17,32 @@ Executable smtlib
                     , cmdargs
     Hs-Source-Dirs:   src/
     Extensions: 	  FlexibleContexts, DoAndIfThenElse
-                                                                      
+
+library
+  build-depends:
+    base >= 4 && < 5,
+    containers >= 0.2,
+    filepath,
+    uu-parsinglib >= 2.7.1,
+    uulib,
+    cmdargs
+
+  ghc-options: -Wall
+
+  if os(darwin)
+    ld-options: -w
+    frameworks: vecLib
+    cpp-options: -D__MACOS__
+
+  hs-source-dirs: src/
+
+  exposed-modules:
+      Language.SMTLib2
+      Language.SMTLib2.Base
+      Language.SMTLib2.Parser
+      Language.SMTLib2.Printer
+
+  other-modules:
+      Language.SMTLib2.Parser.CharSet
+      Language.SMTLib2.Parser.Core
+      Language.SMTLib2.Parser.Token
