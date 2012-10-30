@@ -4,19 +4,20 @@ import Data.Sequence
 
 type SMod = [SExpression] -- One or more SExpr
 
+type SExpressions = [SExpression]
 data SExpression = SE SCmd
                  | Comment
-    deriving Show
+    deriving (Show,Eq,Ord)
 
 -- data SExpression = Token    SToken
 --                  | SeqSExpr [SExpression] 
---     deriving Show
+--     deriving (Show,Eq,Ord)
 -- 
 -- data SToken = LitToken SLiteral
 --             | ResToken SReserved
 --             | SymToken SSymbol
 --             | KeyToken SKeyword
---     deriving Show
+--     deriving (Show,Eq,Ord)
     
 -- The semantics of literals changes
 -- with the Logic.
@@ -25,11 +26,11 @@ data SLiteral = NumLit SNumeral
               | BinLit SBinary
               | HexLit SHex
               | StrLit SString
-    deriving Show
+    deriving (Show,Eq,Ord)
 
 -- data SReserved = ResWrd SResWrd
 --                | Cmd    SCmd
---     deriving Show
+--     deriving (Show,Eq,Ord)
 --     
 -- data SResWrd = RWpar
 --              | RWNUMERAL
@@ -41,8 +42,9 @@ data SLiteral = NumLit SNumeral
 --              | RWlet
 --              | RWforall
 --              | RWexists
---     deriving Show         
- 
+--     deriving (Show,Eq,Ord)         
+
+
 data SCmd = SetLogic     SLogic
           | DeclFun      SSymbol [SSortExpr] SSortExpr
           | DefFun       SSymbol [(SSymbol,SSortExpr)] SSortExpr SExpr
@@ -62,19 +64,23 @@ data SCmd = SetLogic     SLogic
           | GetInfo      SKeyword
           | SetInfo      SKeyword SAttrValue
           | Exit
-    deriving Show
+    deriving (Show,Eq,Ord)
 
 data SLogic = AUFLIA | AUFLIRA | AUFNIRA | LRA | QF_ABV 
             | QF_AUFBV | QF_AUFLIA | QF_AX | QF_BV | QF_IDL 
             | QF_LIA | QF_LRA | QF_NIA | QF_NRA | QF_RDL 
             | QF_UF | QF_UFBV | QF_UFIDL | QF_UFLIA | QF_UFLRA
             | QF_UFNRA | UFLRA | UFNIA
-    deriving (Show,Read)
+    deriving (Show,Read,Eq,Ord)
     
 -- Sort Expression <sort-expr>
 data SSortExpr = SymSort SSort
                | FunSort SSymbol [SSortExpr]
-    deriving Show
+	       | BitVector Int
+               | ArraySort SSortExpr SSortExpr
+               | PairSort SSortExpr SSortExpr
+               | PointerSort SSortExpr
+    deriving (Show,Eq,Ord)
     
 type SSort = String
 
@@ -102,19 +108,19 @@ type SString = String
 data SSymbol = SimpleSym SimpleSym
              | QuotedSym QuotedSym
              | ReservSym ReservSym -- ^ We add an extra constructor for reserved words
-    deriving Show
+    deriving (Show,Eq,Ord)
     
 type SimpleSym = String
 type QuotedSym = String
 type ReservSym = String
 
 newtype SKeyword  = Keyword String
-    deriving Show
+    deriving (Show,Eq,Ord)
     
 -- 3.6 Attributes 
 data SAttribute = AttrKey      SKeyword
                 | AttrKeyValue SKeyword SAttrValue
-    deriving Show
+    deriving (Show,Eq,Ord)
     
 type SAttrValue = SExpr -- SExpression that is not a keyword
 
@@ -126,10 +132,14 @@ data SExpr = LitExpr    SLiteral
            | ExistsExpr [(SSymbol, SSort)] SExpr
            | LetExpr    [(SSymbol, SExpr)] SExpr
            | AttrExpr   SExpr [SAttribute]
-    deriving Show
+           | ExtractExpr [SExpr]
+           | ZeroExtExpr SExpr Int
+           | SignExtExpr SExpr Int
+           | Undef
+    deriving (Show,Eq,Ord)
 
 -- Identifiers (<identifier>) 
 data SIdent = SymIdent SSymbol           -- <symbol>
             | IdxIdent SSymbol [SNumeral] -- ( _ <symbol> <numeral>+)
             | QlfIdent SIdent SSort       -- (qualified-identifier) (as ident sort)
-    deriving Show
+    deriving (Show,Eq,Ord)

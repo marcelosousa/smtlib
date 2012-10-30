@@ -3,6 +3,7 @@ module Main where
 import Language.SMTLib2
 import Language.SMTLib2.Parser
 import Language.SMTLib2.Printer
+import Language.SMTLib2.Builder
 
 main :: IO ()
 main = putStrLn "SMT-Lib v2"

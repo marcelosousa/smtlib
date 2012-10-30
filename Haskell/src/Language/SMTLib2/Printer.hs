@@ -45,6 +45,7 @@ instance SMTPretty SMod where
 -- Pretty instances
 instance Pretty SExpression where
   pretty (SE expr) = parens $ pretty expr
+  pretty (Comment) = empty
   
 instance Pretty SCmd where
   pretty (SetLogic logic)               = text "set-logic"   <+> pretty logic
@@ -78,6 +79,10 @@ instance Pretty SSymbol where
 instance Pretty SSortExpr where
   pretty (SymSort sort)         = pretty sort
   pretty (FunSort sym sortexpr) = parens $ pretty sym <+> spretty sortexpr  
+  pretty (BitVector n)          = parens $ text "_ BitVec" <+> int n
+  pretty (ArraySort t1 t2)      = parens $ text "Array" <+> pretty t1 <+> pretty t2
+  pretty (PairSort  t1 t2)      = parens $ text "Pair" <+> pretty t1 <+> pretty t2
+  pretty (PointerSort  t1)      = parens $ text "Pointer" <+> pretty t1 
 
 instance Pretty SExpr where
   pretty (LitExpr    lit)          = pretty lit
@@ -87,6 +92,9 @@ instance Pretty SExpr where
   pretty (ExistsExpr symsort expr) = parens $ text "exists" <+> parens (spretty symsort) <+> pretty expr 
   pretty (LetExpr    symsort expr) = parens $ text "let" <+> parens (spretty symsort) <+> pretty expr 
   pretty (AttrExpr   expr attrs)   = parens $ char '!'   <+> pretty expr <+> spretty attrs -- TODO
+  pretty (ExtractExpr exprs)       = parens $ hsep $ map pretty exprs
+  pretty (ZeroExtExpr expr n)      = parens $ parens (char '_' <+> text "zero_extend" <+> int n) <+> pretty expr
+  pretty (SignExtExpr expr n)      = parens $ parens (char '_' <+> text "sign_extend" <+> int n) <+> pretty expr
 
 instance Pretty SLiteral where
   pretty (NumLit num) = pretty num
