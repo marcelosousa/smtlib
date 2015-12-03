@@ -70,7 +70,7 @@ data SLogic = AUFLIA | AUFLIRA | AUFNIRA | LRA | QF_ABV
             | QF_AUFBV | QF_AUFLIA | QF_AX | QF_BV | QF_IDL 
             | QF_LIA | QF_LRA | QF_NIA | QF_NRA | QF_RDL 
             | QF_UF | QF_UFBV | QF_UFIDL | QF_UFLIA | QF_UFLRA
-            | QF_UFNRA | UFLRA | UFNIA
+            | QF_UFNRA | UFLRA | UFNIA | HORN
     deriving (Show,Read,Eq,Ord)
     
 -- Sort Expression <sort-expr>
